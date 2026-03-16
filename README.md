@@ -70,12 +70,11 @@ content-studio-ai/
 │   ├── main.py                  # All FastAPI routes & Dost AI chain
 │   ├── models.py                # Pydantic request/response models
 │   ├── requirements.txt
-│   ├── ai/
-│   │   ├── generator.py         # Content generation logic
-│   │   ├── rewriter.py          # Rewrite engine
-│   │   └── plagiarism.py        # Originality scoring
-│   └── storage/
-│       └── history.json         # Persistent generation history
+│   ├── generator.py         # Content generation logic
+│   │── rewriter.py          # Rewrite engine
+│   │── plagiarism.py        # Originality scoring
+│   └── storage_manager.py
+│             # Persistent generation history
 │
 └── frontend/
     └── index.html               # Entire UI — one file, no framework
