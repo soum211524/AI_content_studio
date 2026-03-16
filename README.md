@@ -42,12 +42,10 @@ content-studio-ai/
 │   ├── main.py               # FastAPI app + all endpoints
 │   ├── models.py             # Pydantic request models
 │   ├── requirements.txt
-│   ├── ai/
-│   │   ├── generator.py      # Content generation logic
-│   │   ├── rewriter.py       # Rewrite logic
-│   │   └── plagiarism.py     # Plagiarism scoring
-│   └── storage/
-│       └── history.json      # Backend history store
+│   ├── generator.py      # Content generation logic
+│   |── rewriter.py       # Rewrite logic
+│   │── plagiarism.py     # Plagiarism scoring
+│   
 └── frontend/
     └── index.html            # Entire frontend — single file
 ```
