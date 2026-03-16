@@ -15,7 +15,7 @@
 
 ## What is this?
 
-**Content Studio AI** is a full-stack AI writing platform that puts six powerful tools under one roof — a content generator, a rewrite engine, an originality checker, an SEO suite, a conversational AI companion, and a generation history vault. No subscriptions. No bloat. Just you and your words, powered by one of the fastest LLMs on the planet.
+**Writiq** is a full-stack AI writing platform that puts six powerful tools under one roof — a content generator, a rewrite engine, an originality checker, an SEO suite, a conversational AI companion, and a generation history vault. No subscriptions. No bloat. Just you and your words, powered by one of the fastest LLMs on the planet.
 
 ---
 
