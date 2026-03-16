@@ -1,4 +1,4 @@
-# ✦ Content Studio AI
+# Writiq
 
 <div align="center">
 
