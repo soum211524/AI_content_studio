@@ -1,0 +1,2304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>content.io — AI Writing Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #1c1c1e;
+  --bg2:     #242426;
+  --bg3:     #2c2c2f;
+
+  --card:    #ffffff;
+  --card2:   #f7f6f3;
+  --card3:   #eeece8;
+
+  --ink:     #0f0f10;
+  --ink2:    #2a2a2c;
+  --ink3:    #555558;
+  --ink4:    #909094;
+
+  --border:  #0f0f10;
+  --border2: rgba(15,15,16,0.18);
+  --border3: rgba(15,15,16,0.09);
+
+  --gold:    #c49a2a;
+  --gold-bg: #fdf6e3;
+  --red:     #c0392b;
+  --red-bg:  #fdf2f1;
+  --green:   #1a5e38;
+  --green-bg:#f0f7f3;
+
+  --f-serif: 'Playfair Display', Georgia, serif;
+  --f-sans:  'DM Sans', sans-serif;
+  --f-mono:  'DM Mono', monospace;
+}
+
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 15px; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--f-sans);
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--bg3); }
+
+.app {
+  display: grid;
+  grid-template-columns: 220px 1fr 260px;
+  grid-template-rows: 54px 1fr;
+  min-height: 100vh;
+}
+
+.topbar {
+  grid-column: 1 / -1;
+  height: 54px;
+  background: var(--card);
+  border-bottom: 0px solid var(--border);
+  display: flex;
+  align-items: stretch;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 20px;
+  border-right: 0px solid var(--border);
+  width: 220px;
+  flex-shrink: 0;
+}
+.brand-name {
+  font-family: var(--f-serif);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.brand-name sup {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  font-weight: 300;
+  color: var(--gold);
+  letter-spacing: 0.08em;
+  vertical-align: super;
+  margin-left: 1px;
+}
+
+.nav-tabs {
+  display: flex;
+  align-items: stretch;
+  flex: 1;
+}
+.nav-tab {
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  border: none;
+  border-right: 1px solid var(--border2);
+  background: transparent;
+  font-family: var(--f-sans);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ink4);
+  cursor: pointer;
+  transition: background 0.14s, color 0.14s;
+  letter-spacing: 0.01em;
+  position: relative;
+}
+.nav-tab::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transition: transform 0.18s;
+}
+.nav-tab:hover { background: var(--card2); color: var(--ink2); }
+.nav-tab.on {
+  background: var(--card2);
+  color: var(--ink);
+  font-weight: 500;
+}
+.nav-tab.on::after { transform: scaleX(1); }
+
+.topbar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  border-left: 1px solid var(--border2);
+  gap: 10px;
+}
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px;
+  background: var(--card2);
+  border: 1px solid var(--border2);
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  color: var(--ink4);
+  letter-spacing: 0.03em;
+}
+.pip {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--ink4);
+  flex-shrink: 0;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.pip.ok  { background: var(--green); box-shadow: 0 0 6px rgba(26,94,56,0.5); }
+.pip.err { background: var(--red);   box-shadow: 0 0 6px rgba(192,57,43,0.4); }
+
+.nav {
+  background: var(--card);
+  border-right: 1px solid var(--border);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 54px;
+  height: calc(100vh - 54px);
+  overflow-y: auto;
+}
+/* new */
+#new{
+    background-color: #c6b47b;
+    color: #0f0f10;
+    font-weight: bolder;
+}
+.nav-section-lbl {
+  font-family: var(--f-mono);
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink4);
+  font-weight: 500;
+  padding: 14px 18px 5px;
+  border-bottom: 1px solid var(--border3);
+}
+
+.nbtn {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 12px 18px;
+  border: none;
+  border-bottom: 1px solid var(--border3);
+  border-left: 3px solid transparent;
+  background: transparent;
+  color: var(--ink3);
+  font-family: var(--f-sans);
+  font-size: 13px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.14s;
+  width: 100%;
+  text-align: left;
+}
+.nbtn .ni {
+  width: 26px; height: 26px;
+  background: var(--card3);
+  border: 1px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.14s;
+}
+.nbtn .ni svg { width: 13px; height: 13px; stroke: var(--ink4); fill: none; stroke-width: 1.6; }
+.nbtn:hover { background: var(--card2); color: var(--ink2); border-left-color: var(--border2); }
+.nbtn.on {
+  background: var(--card2);
+  color: var(--ink);
+  font-weight: 500;
+  border-left-color: var(--gold);
+  border-bottom-color: var(--border2);
+}
+.nbtn.on .ni { background: var(--gold); border-color: var(--gold); }
+.nbtn.on .ni svg { stroke: #fff; }
+.nbadge {
+  margin-left: auto;
+  font-family: var(--f-mono);
+  font-size: 10px;
+  color: var(--ink4);
+  background: var(--card3);
+  border: 1px solid var(--border2);
+  padding: 1px 7px;
+}
+.nav-divider { height: 1px; background: var(--border2); }
+
+.nav-footer {
+  margin-top: auto;
+  padding: 14px 14px;
+  border-top: 45px solid var(--border);
+}
+.nf-label {
+  font-family: var(--f-serif);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink4);
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.nfpip {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--ink4);
+  transition: background 0.3s;
+}
+.nfpip.ok  { background: var(--green); }
+.nfpip.err { background: var(--red); }
+.nf-url { font-family: var(--f-serif); font-size: 18px; color: black; font-weight: 800; }
+
+.main {
+  background: var(--bg);
+  padding: 28px 30px;
+  overflow-y: auto;
+  max-height: calc(100vh - 54px);
+}
+
+.panel { display: none; }
+.panel.on { display: flex; flex-direction: column; gap: 16px; animation: fadein 0.2s ease; }
+@keyframes fadein { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+.pg-eyebrow {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+.pg-title {
+  font-family: var(--f-serif);
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--card);
+}
+.pg-title em { font-style: italic; color: rgba(255,255,255,0.5); }
+
+.card {
+  background: var(--card);
+  border: 2px solid var(--border);
+}
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 16px;
+  background: #e1dbca;
+  border-bottom: 1px solid var(--border2);
+}
+.card-step {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  color: var(--gold);
+  text-transform: uppercase;
+  padding: 2px 8px;
+  background: #e1dbca;
+  border: 1px solid var(--gold);
+}
+.card-label {
+  font-family: var(--f-sans);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  color: var(--ink3);
+}
+.card-spacer { flex: 1; }
+.card-meta {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  color: var(--ink4);
+}
+.card-body { padding: 18px; }
+.card-foot {
+  padding: 11px 16px;
+  background: var(--card2);
+  border-top: 1px solid var(--border2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tpl-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+}
+.tpl-cell {
+  padding: 14px 10px;
+  background: var(--card);
+  border-right: 1px solid var(--border2);
+  border-bottom: 1px solid var(--border2);
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.13s;
+  position: relative;
+}
+.tpl-cell:last-child { border-right: none; }
+.tpl-cell::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transition: transform 0.18s;
+}
+.tpl-cell:hover { background: var(--card2); }
+.tpl-cell:hover::before { transform: scaleX(1); }
+.tpl-cell.on { background: var(--gold-bg); }
+.tpl-cell.on::before { transform: scaleX(1); }
+.tc-name { font-family: var(--f-sans); font-size: 11.5px; font-weight: 500; color: var(--ink2); display: block; margin-bottom: 2px; }
+.tpl-cell.on .tc-name { color: var(--ink); }
+.tc-desc { font-family: var(--f-mono); font-size: 9px; color: var(--ink4); }
+
+.field-row { display: grid; gap: 14px; margin-bottom: 14px; }
+.field-row.two { grid-template-columns: 1fr 1fr; }
+.field-row.one { grid-template-columns: 1fr; }
+.field-row:last-child { margin-bottom: 0; }
+.field { display: flex; flex-direction: column; gap: 5px; }
+.flabel {
+  font-family: var(--f-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink4);
+}
+#g-topic {
+  border: 1.5px solid #c49a2a;
+  border-radius: 6px;
+  padding: 10px;
+  outline: none;
+}
+#g-length {
+  border: 1.5px solid #c49a2a;
+  border-radius: 6px;
+  padding: 10px;
+  outline: none;
+}
+#g-audience {
+  border: 1.5px solid #c49a2a;
+  border-radius: 6px;
+  padding: 10px;
+  outline: none;
+}
+
+
+
+
+input[type=text],
+input[type=number],
+select,
+textarea {
+  background: var(--card);
+  border: 1.5px solid var(--border2);
+  padding: 10px 12px;
+  color: var(--ink);
+  font-family: var(--f-sans);
+  font-size: 13.5px;
+  font-weight: 300;
+  outline: none;
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+input::placeholder, textarea::placeholder { color: var(--ink4); }
+input:focus, select:focus, textarea:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(196,154,42,0.12);
+}
+select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M5 6L0 0h10z' fill='%23909094'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
+textarea { resize: vertical; min-height: 128px; line-height: 1.7; }
+
+.char-hint {
+  font-family: var(--f-mono);
+  font-size: 9.5px;
+  color: var(--ink4);
+  text-align: right;
+  padding: 6px 18px 0;
+}
+
+.tone-grid { display: flex; flex-wrap: wrap; }
+.tone-chip {
+  padding: 9px 15px;
+  border: none;
+  border-right: 1px solid var(--border2);
+  border-bottom: 1px solid var(--border2);
+  background: var(--card);
+  color: var(--ink3);
+  font-family: var(--f-sans);
+  font-size: 12.5px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: background 0.13s, color 0.13s;
+  letter-spacing: 0.01em;
+}
+.tone-chip:hover { background: var(--card3); color: var(--ink); }
+.tone-chip.on { background: var(--ink); color: var(--card); font-weight: 500; }
+
+.mode-grid { display: grid; grid-template-columns: repeat(3, 1fr); }
+.mode-cell {
+  padding: 14px 16px;
+  background: var(--card);
+  border-right: 1px solid var(--border2);
+  border-bottom: 1px solid var(--border2);
+  cursor: pointer;
+  transition: background 0.13s;
+  border-left: 3px solid transparent;
+}
+.mode-cell:hover { background: var(--card2); }
+.mode-cell.on { background: var(--gold-bg); border-left-color: var(--gold); }
+.mc-name { font-family: var(--f-sans); font-size: 12.5px; font-weight: 500; color: var(--ink2); margin-bottom: 2px; }
+.mode-cell.on .mc-name { color: var(--ink); }
+.mc-hint { font-family: var(--f-mono); font-size: 9.5px; color: var(--ink4); }
+
+.btn-block {
+  padding: 13px 16px;
+  background: var(--card2);
+  border-top: 1px solid var(--border2);
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 12px 20px;
+  background: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 0;
+  color: var(--card);
+  font-family: var(--f-sans);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background 0.16s, border-color 0.16s;
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+}
+.btn-primary:hover { background: var(--ink2); border-color: var(--ink2); }
+.btn-primary.busy { opacity: 0.55; pointer-events: none; }
+
+.btn-secondary {
+  width: 100%;
+  padding: 11px 20px;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 0;
+  color: var(--ink2);
+  font-family: var(--f-sans);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+}
+.btn-secondary:hover { background: var(--card3); }
+.btn-secondary.busy { opacity: 0.55; pointer-events: none; }
+
+.spin {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.18);
+  border-top-color: rgba(255,255,255,0.85);
+  animation: sp .6s linear infinite;
+  display: none; flex-shrink: 0;
+}
+.spin.dk { border-color: var(--border3); border-top-color: var(--ink3); }
+@keyframes sp { to { transform: rotate(360deg); } }
+
+.errbox {
+  background: var(--red-bg);
+  border: 1.5px solid var(--red);
+  border-left: 4px solid var(--red);
+  padding: 11px 14px;
+  font-family: var(--f-mono);
+  font-size: 11.5px;
+  color: var(--red);
+  line-height: 1.6;
+  display: none;
+}
+.errbox.show { display: block; }
+
+.output-card {
+  background: var(--card);
+  border: 2px solid var(--border);
+  display: none;
+}
+.output-card.show { display: block; animation: fadein 0.24s ease; }
+
+.oc-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--card2);
+  border-bottom: 1px solid var(--border2);
+}
+.oc-tag {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border: 1px solid;
+}
+.tag-ok  { background: var(--green-bg); color: var(--green); border-color: var(--green); }
+.tag-rw  { background: var(--gold-bg);  color: var(--gold);  border-color: var(--gold); }
+.tag-pl  { background: var(--card3);    color: var(--ink3);  border-color: var(--border2); }
+.oc-info { font-family: var(--f-mono); font-size: 10px; color: var(--ink4); }
+.oc-acts { margin-left: auto; display: flex; gap: 5px; }
+
+.sm-btn {
+  padding: 5px 11px;
+  border: 1px solid var(--border2);
+  border-radius: 0;
+  background: var(--card);
+  color: var(--ink4);
+  font-family: var(--f-sans);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.13s;
+}
+.sm-btn:hover { color: var(--ink); border-color: var(--border); background: var(--card2); }
+.sm-btn.did { color: var(--green); border-color: var(--green); }
+
+.oc-body {
+  padding: 20px 22px;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.85;
+  color: var(--ink2);
+  white-space: pre-wrap;
+  min-height: 60px;
+}
+.oc-foot {
+  padding: 8px 14px;
+  border-top: 1px solid var(--border2);
+  background: var(--card2);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.oc-stat { font-family: var(--f-mono); font-size: 10px; color: var(--ink4); }
+.oc-stat b { color: var(--ink3); font-weight: 400; }
+
+.caret {
+  display: inline-block;
+  width: 1.5px; height: .9em;
+  background: var(--gold);
+  vertical-align: text-bottom;
+  margin-left: 1px;
+  animation: blink .8s step-end infinite;
+}
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+
+.plag-body { padding: 22px 22px; }
+.plag-top { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 16px; }
+.plag-num {
+  font-family: var(--f-serif);
+  font-size: 72px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  transition: color 0.4s;
+}
+.plag-verdict {
+  padding: 7px 16px;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1.5px solid;
+}
+.plag-track {
+  background: var(--card3);
+  border: 1px solid var(--border2);
+  padding: 3px;
+  margin-bottom: 14px;
+}
+.plag-fill {
+  height: 6px;
+  width: 0%;
+  -webkit-transition: width 1.1s cubic-bezier(.4,0,.2,1);
+  transition: width 1.1s cubic-bezier(.4,0,.2,1);
+}
+.plag-detail {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--ink3);
+  line-height: 1.75;
+  padding-left: 14px;
+  border-left: 3px solid var(--border2);
+}
+
+.aside {
+  background: var(--card);
+  border-left: 2px solid black;
+  position: sticky;
+  top: 54px;
+  height: calc(100vh - 54px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.aside-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 10px solid var(--border);
+}
+.astat {
+  padding: 16px 16px;
+  background: var(--card2);
+  border-right: 1px solid var(--border2);
+}
+.astat:last-child { border-right: none; }
+.astat-lbl {
+  font-family: var(--f-sans);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+ font-weight:300;
+  color: black;
+  margin-bottom: 5px;
+  color: #000;
+}
+.astat-val {
+  font-family: var(--f-sans);
+  font-size: 28px;
+  font-weight: 600;
+  color:black;
+  line-height: 1;
+}
+.astat-sub { font-size: 11px; font-weight: 300; color:black; margin-top: 3px; }
+
+.aside-hist-hdr {
+  padding: 10px 16px;
+  background: var(--card2);
+  border-bottom: 10px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.aside-hist-hdr span {
+  font-family: var(--f-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: black;
+}
+.aside-hist-hdr button {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color:black;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.13s;
+}
+.aside-hist-hdr button:hover { color: var(--red); }
+
+.hist-list { flex: 1; overflow-y: auto; }
+.hist-empty {
+  padding: 28px 14px;
+  text-align: center;
+  font-size: 12.5px;
+  font-weight: 300;
+  color:black;
+  border-bottom: 5px solid var(--border3);
+}
+.hist-item {
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--border2);
+  cursor: pointer;
+  transition: background 0.13s;
+  border-left: 3px solid transparent;
+}
+.hist-item:hover { background: var(--card2); border-left-color: var(--gold); }
+.hi-type {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink4);
+  margin-bottom: 3px;
+}
+.hi-topic {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hi-prev {
+  font-size: 11.5px;
+  font-weight: 300;
+  color: var(--ink4);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  line-height: 1.5;
+}
+.hi-chips { display: flex; gap: 5px; margin-top: 6px; flex-wrap: wrap; }
+.hi-chip {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  padding: 1px 6px;
+  background: var(--card3);
+  border: 1px solid var(--border2);
+  color: var(--ink4);
+}
+
+.hpage-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 0;
+}
+.hpage-count { font-family: var(--f-mono); font-size: 11px; color: rgba(255,255,255,0.35); }
+.hpage-acts { display: flex; gap: 8px; }
+
+.hgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(258px, 1fr));
+  border: 2px solid var(--border);
+  background: var(--border2);
+  gap: 1px;
+}
+.hcard {
+  background: var(--card);
+  padding: 18px;
+  cursor: pointer;
+  transition: background 0.14s;
+  border-top: 3px solid transparent;
+}
+.hcard:hover { background: var(--card2); border-top-color: var(--gold); }
+.hc-type {
+  font-family: var(--f-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink4);
+  margin-bottom: 7px;
+}
+.hc-topic {
+  font-family: var(--f-serif);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+.hc-prev {
+  font-size: 12.5px;
+  font-weight: 300;
+  color: var(--ink4);
+  line-height: 1.65;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+}
+.hc-foot {
+  display: flex;
+  gap: 6px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+  padding-top: 10px;
+  border-top: 1px solid var(--border2);
+}
+.hc-chip {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  padding: 2px 7px;
+  background: var(--card3);
+  border: 1px solid var(--border2);
+  color: var(--ink4);
+}
+.hgrid-empty {
+  grid-column: 1/-1;
+  background: var(--card);
+  padding: 55px 0;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--ink4);
+}
+
+.toast-tray {
+  position: fixed;
+  bottom: 18px; right: 18px;
+  display: flex; flex-direction: column; gap: 6px;
+  z-index: 9999;
+}
+.toast {
+  padding: 10px 16px;
+  background: var(--ink);
+  border: 1px solid rgba(255,255,255,0.1);
+  font-family: var(--f-sans);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--card);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.5);
+  display: flex; align-items: center; gap: 10px;
+  animation: tin .2s ease;
+  max-width: 285px;
+}
+.toast.ok  { border-left: 3px solid var(--green); }
+.toast.err { border-left: 3px solid var(--red); }
+.toast.inf { border-left: 3px solid var(--gold); }
+.t-ico { font-family: var(--f-mono); font-size: 11px; opacity: 0.6; flex-shrink: 0; }
+@keyframes tin  { from { opacity:0; transform:translateX(10px); } to { opacity:1; transform:translateX(0); } }
+@keyframes tout { to   { opacity:0; transform:translateX(10px); } }
+
+@media (max-width: 960px) {
+  .app { grid-template-columns: 1fr; }
+  .nav { display: none; }
+  .aside { display: none; }
+  .main { max-height: none; padding: 18px; }
+  .tpl-row { grid-template-columns: repeat(3, 1fr); }
+  .mode-grid { grid-template-columns: 1fr 1fr; }
+  .brand { width: auto; }
+}
+
+/* ================================================
+   DOST AI — added, nothing above this line changed
+   ================================================ */
+.dost-shell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--card);
+  border: 2px solid var(--border);
+  overflow: hidden;
+  height: calc(100vh - 54px - 110px);
+}
+.dost-topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: #d2c5a6;
+  border-bottom: 1px solid var(--border2);
+  flex-shrink: 0;
+}
+.dost-avatar {
+  width: 30px; height: 30px;
+  background: var(--ink);
+  border: 1.5px solid var(--ink);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.dost-avatar svg { width: 14px; height: 14px; stroke: var(--card); fill: none; stroke-width: 1.6; }
+.dost-name { font-family: var(--f-sans); font-size: 13.5px; font-weight: 600; color: var(--ink); }
+.dost-tagline { font-family: var(--f-sans); font-size: 15px; color: black; margin-left: 4px; }
+.dost-status {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--f-mono); font-size: 10px; color: var(--ink4);
+}
+.dost-pip {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 5px rgba(26,94,56,0.5);
+  animation: dp 2.5s ease-in-out infinite;
+}
+@keyframes dp { 0%,100%{opacity:1;} 50%{opacity:0.35;} }
+.dost-clear-btn {
+  padding: 4px 10px;
+  border: 2px solid var(--border2);
+  background: black;
+  color:white;
+  font-family: var(--f-sans);
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.13s;
+  margin-left: 8px;
+  position: relative;
+}
+.dost-clear-btn:hover { border-color: var(--white); color: white; }
+
+.dost-msgs {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: var(--card);
+  min-height: 0;
+}
+.dost-msgs::-webkit-scrollbar { width: 4px; }
+.dost-msgs::-webkit-scrollbar-thumb { background: var(--card3); }
+
+.dost-welcome {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  padding: 30px 20px;
+}
+.dost-welcome-icon {
+  width: 52px; height: 52px;
+  background: var(--ink);
+  border: 2px solid var(--ink);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 8px;
+}
+.dost-welcome-icon svg { width: 22px; height: 22px; stroke: var(--card); fill: none; stroke-width: 1.5; }
+.dost-welcome h3 { font-family: var(--f-serif); font-size: 22px; font-weight: 600; color: var(--ink); }
+.dost-welcome p { font-size: 13px; font-weight: 300; color: var(--ink4); max-width: 320px; line-height: 1.7; }
+.dost-prompts { display: flex; flex-wrap: wrap; gap: 7px; justify-content: center; margin-top: 8px; }
+.dost-prompt-btn {
+  padding: 7px 13px;
+  border: 1px solid var(--border2);
+  background: var(--card2);
+  color: var(--ink3);
+  font-family: var(--f-sans);
+  font-size: 12px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.13s;
+}
+.dost-prompt-btn:hover { background: var(--gold-bg); border-color: var(--gold); color: var(--ink); }
+
+.msg {
+  display: flex;
+  gap: 11px;
+  max-width: 88%;
+  animation: msgfade 0.22s ease;
+}
+@keyframes msgfade { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+.msg.user      { align-self: flex-end; flex-direction: row-reverse; }
+.msg.assistant { align-self: flex-start; }
+.msg-avatar {
+  width: 28px; height: 28px;
+  flex-shrink: 0;
+  border: 1.5px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 2px;
+  font-family: var(--f-mono);
+  font-size: 9px;
+  color: var(--ink4);
+}
+.msg.user .msg-avatar      { background: var(--ink); border-color: var(--ink); color: var(--card); }
+.msg.assistant .msg-avatar { background: var(--gold-bg); border-color: var(--gold); color: var(--gold); }
+.msg-bubble {
+  padding: 12px 15px;
+  font-size: 13.5px;
+  font-weight: 300;
+  line-height: 1.75;
+  border: 1.5px solid var(--border2);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.msg.user .msg-bubble      { background: var(--ink); color: var(--card); border-color: var(--ink); font-weight: 400; }
+.msg.assistant .msg-bubble { background: var(--card2); color: var(--ink2); }
+
+.msg-typing .msg-bubble { padding: 14px 18px; }
+.typing-dots { display: flex; gap: 5px; align-items: center; }
+.typing-dots span {
+  width: 6px; height: 6px;
+  background: var(--ink4);
+  border-radius: 50%;
+  animation: tdot 1.2s ease-in-out infinite;
+}
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes tdot { 0%,80%,100%{transform:scale(0.6);opacity:0.4;} 40%{transform:scale(1);opacity:1;} }
+
+.dost-input-area {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border2);
+  background: var(--card2);
+  padding: 12px 16px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+.dost-textarea {
+  flex: 1;
+  background: var(--card);
+  border: 1.5px solid var(--border2);
+  padding: 10px 13px;
+  color: var(--ink);
+  font-family: var(--f-sans);
+  font-size: 13.5px;
+  font-weight: 300;
+  line-height: 1.5;
+  resize: none;
+  outline: none;
+  min-height: 44px;
+  max-height: 130px;
+  overflow-y: auto;
+  border-radius: 0;
+  transition: border-color 0.15s;
+}
+.dost-textarea::placeholder { color: var(--ink4); }
+.dost-textarea:focus { border-color: var(--gold); }
+.dost-send {
+  width: 44px; height: 44px;
+  flex-shrink: 0;
+  background: var(--ink);
+  border: 2px solid var(--ink);
+  color: var(--card);
+  cursor: pointer;
+  transition: background 0.15s;
+  display: flex; align-items: center; justify-content: center;
+}
+.dost-send:hover { background: var(--ink2); border-color: var(--ink2); }
+.dost-send:disabled { opacity: 0.45; pointer-events: none; }
+.dost-send svg { width: 16px; height: 16px; stroke: var(--card); fill: none; stroke-width: 2; }
+.dost-hint {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  color: var(--ink4);
+  padding: 5px 16px;
+  border-top: 1px solid var(--border3);
+  background: var(--card2);
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+/*  SEO OPTIMIZER */
+.seo-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border2);
+  background:rgb(192, 192, 161);
+  
+}
+.seo-tab {
+  padding: 10px 18px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-right: 1px solid var(--border2);
+  background: transparent;
+  font-family: var(--f-sans);
+  font-size: 12.5px;
+  font-weight: 400;
+  color:black;
+  cursor: pointer;
+  transition: all 0.13s;
+  letter-spacing: 0.01em;
+}
+.seo-tab:hover { background: var(--card3); color: var(--ink2); }
+.seo-tab.on { color: var(--ink); font-weight: 500; border-bottom-color: var(--gold); background: var(--card); }
+.seo-section { display: none; }
+.seo-section.on { display: block; }
+
+.seo-score-wrap {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 22px 22px 10px;
+  border-bottom: 1px solid var(--border2);
+}
+.seo-ring-outer {
+  position: relative;
+  width: 88px; height: 88px;
+  flex-shrink: 0;
+}
+.seo-ring-outer svg { width: 88px; height: 88px; transform: rotate(-90deg); }
+.seo-ring-bg   { fill: none; stroke: var(--card3); stroke-width: 7; }
+.seo-ring-fill { fill: none; stroke-width: 7; stroke-linecap: butt;
+  stroke-dasharray: 226; stroke-dashoffset: 226;
+  transition: stroke-dashoffset 1.1s cubic-bezier(.4,0,.2,1), stroke 0.4s; }
+.seo-ring-num {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  font-family: var(--f-serif); font-size: 22px; font-weight: 700; color: var(--ink);
+}
+.seo-score-label { font-family: var(--f-mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink4); margin-bottom: 4px; }
+.seo-score-verdict { font-family: var(--f-sans); font-size: 17px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+.seo-score-hint { font-size: 12.5px; font-weight: 300; color: var(--ink4); line-height: 1.6; max-width: 320px; }
+
+.seo-suggestions { padding: 16px 22px 20px; }
+.seo-suggestions-lbl { font-family: var(--f-mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink4); margin-bottom: 12px; }
+.seo-item { display: flex; gap: 12px; align-items: flex-start; padding: 11px 0; border-bottom: 1px solid var(--border3); animation: fadein 0.2s ease; }
+.seo-item:last-child { border-bottom: none; }
+.seo-badge { flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--f-mono); font-size: 10px; margin-top: 1px; }
+.seo-badge.ok   { background: var(--green-bg); color: var(--green); border: 1px solid rgba(26,94,56,0.25); }
+.seo-badge.warn { background: var(--gold-bg);  color: var(--gold);  border: 1px solid rgba(196,154,42,0.25); }
+.seo-badge.err  { background: var(--red-bg);   color: var(--red);   border: 1px solid rgba(192,57,43,0.2); }
+.seo-item-text { font-size: 13px; font-weight: 300; color: var(--ink2); line-height: 1.65; }
+.seo-item-text b { font-weight: 500; color: var(--ink); }
+
+.seo-meta-out { padding: 18px 22px; display: flex; flex-direction: column; gap: 14px; }
+.seo-meta-field { display: flex; flex-direction: column; gap: 6px; }
+.seo-meta-lbl { font-family: var(--f-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink4); display: flex; align-items: center; justify-content: space-between; }
+.seo-meta-lbl span { font-size: 9px; color: var(--ink4); }
+.seo-meta-val { background: var(--card2); border: 1px solid var(--border2); padding: 10px 13px; font-size: 13.5px; font-weight: 300; color: var(--ink2); line-height: 1.6; min-height: 38px; white-space: pre-wrap; }
+.seo-meta-val.title-val { font-weight: 500; color: var(--ink); font-size: 14px; }
+.seo-meta-copy { align-self: flex-end; padding: 4px 10px; border: 1px solid var(--border2); background: var(--card); color: var(--ink4); font-family: var(--f-mono); font-size: 9.5px; cursor: pointer; transition: all 0.13s; }
+.seo-meta-copy:hover { border-color: var(--gold); color: var(--gold); }
+.seo-meta-copy.did { border-color: var(--green); color: var(--green); }
+
+.seo-serp { margin: 0 22px 18px; padding: 14px 16px; background: var(--card2); border: 1px solid var(--border2); border-left: 3px solid var(--gold); }
+.seo-serp-lbl { font-family: var(--f-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink4); margin-bottom: 8px; }
+.seo-serp-url   { font-size: 11.5px; color: var(--green); margin-bottom: 3px; }
+.seo-serp-title { font-size: 15px; color: #1a0dab; font-weight: 500; margin-bottom: 3px; line-height: 1.3; }
+.seo-serp-desc  { font-size: 12.5px; color: var(--ink3); font-weight: 300; line-height: 1.55; }
+
+.seo-outline-out { padding: 18px 22px; }
+.seo-outline-item { display: flex; gap: 12px; align-items: flex-start; padding: 9px 0; border-bottom: 1px solid var(--border3); animation: fadein 0.18s ease; }
+.seo-outline-item:last-child { border-bottom: none; }
+.seo-outline-tag { flex-shrink: 0; font-family: var(--f-mono); font-size: 9px; padding: 2px 7px; border: 1px solid var(--border2); background: var(--card3); color: var(--ink4); margin-top: 2px; letter-spacing: 0.06em; }
+.seo-outline-tag.h1 { background: var(--ink); color: var(--card); border-color: var(--ink); }
+.seo-outline-tag.h2 { background: var(--gold-bg); color: var(--gold); border-color: var(--gold); }
+.seo-outline-tag.h3 { background: var(--card3); color: var(--ink3); }
+.seo-outline-text { font-size: 13.5px; font-weight: 300; color: var(--ink2); line-height: 1.5; }
+.seo-outline-text b { font-weight: 500; color: var(--ink); }
+.seo-outline-kw { font-family: var(--f-mono); font-size: 9.5px; color: var(--green); margin-top: 3px; display: block; }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-name">Content Studio<sup>AI</sup></div>
+    </div>
+
+    <nav class="nav-tabs">
+      <button class="nav-tab on"  onclick="gotoPanel('generate',0)">Generate</button>
+      <button class="nav-tab"     onclick="gotoPanel('rewrite',1)">Rewrite</button>
+      <button class="nav-tab"     onclick="gotoPanel('plagiarism',2)">Plagiarism</button>
+      <button class="nav-tab"     onclick="gotoPanel('history',3)">History</button>
+      <button class="nav-tab"  id="new"   onclick="gotoPanel('dostai',4)">Dost AI</button>
+      <button class="nav-tab"     onclick="gotoPanel('seo',5)">SEO</button>
+    </nav>
+
+  </header>
+
+  <!-- LEFT NAV -->
+  <nav class="nav">
+    <div class="nav-section-lbl">Workspace</div>
+
+    <button class="nbtn on" onclick="gotoPanel('generate',0)">
+      Generate
+    </button>
+    <button class="nbtn" onclick="gotoPanel('rewrite',1)">
+      Rewrite
+    </button>
+    <button class="nbtn" onclick="gotoPanel('plagiarism',2)">
+      Plagiarism
+    </button>
+
+    <div class="nav-divider"></div>
+    <div class="nav-section-lbl">Records</div>
+
+    <button class="nbtn" onclick="gotoPanel('history',3)">
+      History
+      <span class="nbadge" id="nbadge">0</span>
+    </button>
+
+    <div class="nav-divider"></div>
+    <div class="nav-section-lbl">Assistant</div>
+
+    <button class="nbtn" onclick="gotoPanel('dostai',4)">
+      Dost AI
+    </button>
+
+    <div class="nav-divider"></div>
+    <div class="nav-section-lbl">Optimize</div>
+
+    <button class="nbtn" onclick="gotoPanel('seo',5)">
+      SEO Optimizer
+    </button>
+
+    <div class="nav-footer">
+      <div class="nf-url">Next level Content Generation</div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- GENERATE -->
+    <div id="panel-generate" class="panel on">
+      <div>
+        <div class="pg-eyebrow">Content Generation</div>
+        <div class="pg-title">What would you like<br><em>to write today?</em></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <span class="card-label">Select Template</span>
+        </div>
+        <div class="tpl-row">
+          <div class="tpl-cell on" data-v="blog_intro" onclick="pickTpl(this)">
+            <span class="tc-name">Blog Intro</span><span class="tc-desc">Hook readers</span>
+          </div>
+          <div class="tpl-cell" data-v="twitter_thread" onclick="pickTpl(this)">
+            <span class="tc-name">Twitter</span><span class="tc-desc">Thread / post</span>
+          </div>
+          <div class="tpl-cell" data-v="linkedin_post" onclick="pickTpl(this)">
+            <span class="tc-name">LinkedIn</span><span class="tc-desc">Professional</span>
+          </div>
+          <div class="tpl-cell" data-v="product_description" onclick="pickTpl(this)">
+            <span class="tc-name">Product</span><span class="tc-desc">Description</span>
+          </div>
+          <div class="tpl-cell" data-v="youtube_script" onclick="pickTpl(this)">
+            <span class="tc-name">YouTube</span><span class="tc-desc">Video script</span>
+          </div>
+          <div class="tpl-cell" data-v="instagram_caption" onclick="pickTpl(this)">
+            <span class="tc-name">Instagram</span><span class="tc-desc">instagram caption</span>
+          </div>
+          <div class="tpl-cell" data-v="instagram_story" onclick="pickTpl(this)">
+            <span class="tc-name">Instagram Story</span><span class="tc-desc">Redefine Stories</span>
+          </div>
+          <div class="tpl-cell" data-v="instagram_reel_script" onclick="pickTpl(this)">
+            <span class="tc-name">Instagram Reel</span><span class="tc-desc">Script</span>
+          </div>
+          <div class="tpl-cell" data-v="facebook_post" onclick="pickTpl(this)">
+            <span class="tc-name">Facebook</span><span class="tc-desc">Post</span>
+          </div>
+          <div class="tpl-cell" data-v="email_newsletter" onclick="pickTpl(this)">
+            <span class="tc-name">Email</span><span class="tc-desc">Newsletter</span>
+          </div>
+          <div class="tpl-cell" data-v="seo_meta_description" onclick="pickTpl(this)">
+            <span class="tc-name">SEO</span><span class="tc-desc">Meta Description</span>
+          </div>
+          <div class="tpl-cell" data-v="podcast_intro" onclick="pickTpl(this)">
+            <span class="tc-name">Podcast</span><span class="tc-desc">Intro</span>
+          </div>
+          <div class="tpl-cell" data-v="motivational_quote" onclick="pickTpl(this)">
+            <span class="tc-name">Motivational Quotes</span><span class="tc-desc">Motivate</span>
+          </div>
+          <div class="tpl-cell" data-v="startup_pitch" onclick="pickTpl(this)">
+            <span class="tc-name">Startup Pitch</span><span class="tc-desc">Your Startup Journey</span>
+          </div>
+          <div class="tpl-cell" data-v="research_paper" onclick="pickTpl(this)">
+            <span class="tc-name">Research Paper</span><span class="tc-desc">Content</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <span class="card-label">Parameters</span>
+        </div>
+        <div class="card-body">
+          <div class="field-row one">
+            <div class="field">
+              <label class="flabel">Topic / Subject *</label>
+              <input type="text" id="g-topic" placeholder="e.g. The Future of Artificial Intelligence">
+            </div>
+          </div>
+          <div class="field-row two">
+            <div class="field">
+              <label class="flabel">Target Audience</label>
+              <input type="text" id="g-audience" placeholder="e.g. Tech founders, students...">
+            </div>
+            <div class="field">
+              <label class="flabel">Word Count</label>
+              <input type="number" id="g-length" value="250" min="50" max="1000" step="50">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <span class="card-label">Writing Tone</span>
+        </div>
+        <div class="tone-grid" id="toneGrid">
+          <button class="tone-chip on"  data-v="Professional" onclick="pickTone(this)">Professional</button>
+          <button class="tone-chip"     data-v="Casual"        onclick="pickTone(this)">Casual</button>
+          <button class="tone-chip"     data-v="Motivational"  onclick="pickTone(this)">Motivational</button>
+          <button class="tone-chip"     data-v="Marketing"     onclick="pickTone(this)">Marketing</button>
+          <button class="tone-chip"     data-v="Educational"   onclick="pickTone(this)">Educational</button>
+          <button class="tone-chip"     data-v="Humorous"      onclick="pickTone(this)">Humorous</button>
+        </div>
+        <div class="btn-block">
+          <button class="btn-primary" id="genbtn" onclick="doGenerate()">
+            <div class="spin" id="genspin"></div>
+            <span id="genlbl">Generate Content</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="errbox" id="generr"></div>
+
+      <div class="output-card" id="genout">
+        <div class="oc-head">
+          <div class="oc-tag tag-ok">Generated</div>
+          <div class="oc-info" id="genmeta">—</div>
+          <div class="oc-acts">
+            <button class="sm-btn" id="gencpbtn" onclick="copyOut('genbody','gencpbtn')">Copy</button>
+            <button class="sm-btn" onclick="saveManual()">Save</button>
+          </div>
+        </div>
+        <div class="oc-body" id="genbody"></div>
+        <div class="oc-foot">
+          <div class="oc-stat">Words: <b id="genwords">—</b></div>
+          <div class="oc-stat">Characters: <b id="genchars">—</b></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REWRITE starts here -->
+    <div id="panel-rewrite" class="panel">
+      <div>
+        <div class="pg-eyebrow">Rewrite Engine</div>
+        <div class="pg-title">Refine your<br><em>existing writing</em></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <span class="card-step">01</span>
+          <span class="card-label">Rewrite Mode</span>
+        </div>
+        <div class="mode-grid">
+          <div class="mode-cell on" data-v="Simplify" onclick="pickMode(this)">
+            <div class="mc-name">Simplify</div><div class="mc-hint">Clearer, easier to read</div>
+          </div>
+          <div class="mode-cell" data-v="Professional" onclick="pickMode(this)">
+            <div class="mc-name">Professional</div><div class="mc-hint">Formal business tone</div>
+          </div>
+          <div class="mode-cell" data-v="Marketing" onclick="pickMode(this)">
+            <div class="mc-name">Marketing</div><div class="mc-hint">Persuasive &amp; compelling</div>
+          </div>
+          <div class="mode-cell" data-v="Expand" onclick="pickMode(this)">
+            <div class="mc-name">Expand</div><div class="mc-hint">More depth and detail</div>
+          </div>
+          <div class="mode-cell" data-v="Shorten" onclick="pickMode(this)">
+            <div class="mc-name">Shorten</div><div class="mc-hint">Concise and tight</div>
+          </div>
+          <div class="mode-cell" data-v="Formal" onclick="pickMode(this)">
+            <div class="mc-name">Formal</div><div class="mc-hint">Academic register</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <span class="card-step">02</span>
+          <span class="card-label">Input Text</span>
+          <span class="card-spacer"></span>
+          <span class="card-meta"><span id="rwcount">0</span> chars</span>
+        </div>
+        <div class="card-body" style="padding-bottom:0;">
+          <textarea id="rw-text" placeholder="Paste the content you want to rewrite..." oninput="countChars('rw-text','rwcount')"></textarea>
+        </div>
+        <div class="btn-block">
+          <button class="btn-secondary" id="rwbtn" onclick="doRewrite()">
+            <div class="spin dk" id="rwspin"></div>
+            <span id="rwlbl">Rewrite Content</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="errbox" id="rwerr"></div>
+
+      <div class="output-card" id="rwout">
+        <div class="oc-head">
+          <div class="oc-tag tag-rw">Rewritten</div>
+          <div class="oc-info" id="rwmeta">—</div>
+          <div class="oc-acts">
+            <button class="sm-btn" id="rwcpbtn" onclick="copyOut('rwbody','rwcpbtn')">Copy</button>
+          </div>
+        </div>
+        <div class="oc-body" id="rwbody"></div>
+        <div class="oc-foot">
+          <div class="oc-stat">Words: <b id="rwwords">—</b></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLAGIARISM starts heree-->
+    <div id="panel-plagiarism" class="panel">
+      <div>
+        <div class="pg-eyebrow">Originality Analysis</div>
+        <div class="pg-title">Check your<br><em>content originality</em></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <span class="card-step">01</span>
+          <span class="card-label">Input Text</span>
+          <span class="card-spacer"></span>
+          <span class="card-meta"><span id="plcount">0</span> chars · <span id="plwords">0</span> words</span>
+        </div>
+        <div class="card-body" style="padding-bottom:0;">
+          <textarea id="pl-text" rows="8" placeholder="Paste your content here to analyze for originality..." oninput="countChars('pl-text','plcount')"></textarea>
+        </div>
+        <div class="btn-block">
+          <button class="btn-secondary" id="plbtn" onclick="doPlagiarism()">
+            <div class="spin dk" id="plspin"></div>
+            <span id="pllbl">Analyze Originality</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="errbox" id="plerr"></div>
+
+      <div class="output-card" id="plout">
+        <div class="oc-head">
+          <div class="oc-tag tag-pl">Analysis Complete</div>
+          <div class="oc-info" id="plmeta">—</div>
+        </div>
+        <div class="plag-body">
+          <div class="plag-top">
+            <div>
+              <div style="font-family:var(--f-mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink4);margin-bottom:6px;">Similarity Score</div>
+              <div class="plag-num" id="plnum">0%</div>
+            </div>
+            <div class="plag-verdict" id="plverdict">—</div>
+          </div>
+          <div class="plag-track"><div class="plag-fill" id="plbar"></div></div>
+          <div class="plag-detail" id="pldetail">Run an analysis to see results.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORY from here-->
+    <div id="panel-history" class="panel">
+      <div>
+        <div class="pg-eyebrow">Content Archive</div>
+        <div class="pg-title">Your generation<br><em>history</em></div>
+      </div>
+      <div class="hpage-bar">
+        <div class="hpage-count" id="hfcount">0 items</div>
+        <div class="hpage-acts">
+          <button class="sm-btn" onclick="loadFromBackend()" style="border-color:var(--green);color:var(--green);background:var(--card);">Sync Backend</button>
+          <button class="sm-btn" onclick="clearHistory()" style="border-color:var(--red);color:var(--red);background:var(--card);">Clear All</button>
+        </div>
+      </div>
+      <div class="hgrid" id="hfgrid">
+        <div class="hgrid-empty">No history yet. Generate some content to get started.</div>
+      </div>
+    </div>
+
+    <!-- DOST AI -->
+    <div id="panel-dostai" class="panel">
+      <div>
+        <div class="pg-eyebrow">AI Chat Assistant</div>
+        <div class="pg-title">Meet <em>Dost AI</em></div>
+      </div>
+
+      <div class="dost-shell">
+        <div class="dost-topbar">
+          <div class="dost-avatar">
+            <svg viewBox="0 0 16 16"><circle cx="8" cy="6" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+          </div>
+          <div>
+            <span class="dost-name">Dost AI</span>
+            <span class="dost-tagline">— Your content companion</span>
+          </div>
+          <button class="dost-clear-btn" onclick="dostClear()">Clear chat</button>
+        </div>
+
+        <div class="dost-msgs" id="dostMsgs">
+          <div class="dost-welcome" id="dostWelcome">
+            <div class="dost-welcome-icon">
+              <svg viewBox="0 0 16 16"><circle cx="8" cy="6" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+            </div>
+            <h3>Hi, I&#39;m Dost AI</h3>
+            <p>Your writing companion. Ask me anything about content strategy, copywriting, or get feedback on your drafts.</p>
+            <div class="dost-prompts">
+              <button class="dost-prompt-btn" onclick="dostQuickSend('Help me write a compelling blog intro about AI in healthcare')">Blog intro ideas</button>
+              <button class="dost-prompt-btn" onclick="dostQuickSend('What makes a great LinkedIn post? Give me a framework')">LinkedIn tips</button>
+              <button class="dost-prompt-btn" onclick="dostQuickSend('How do I write a YouTube script that keeps viewers watching?')">YouTube scripts</button>
+              <button class="dost-prompt-btn" onclick="dostQuickSend('Give me 5 headline formulas that actually convert')">Headline formulas</button>
+              <button class="dost-prompt-btn" onclick="dostQuickSend('What is content.io and what can it do for me?')">About content.io</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="dost-input-area">
+          <textarea
+            class="dost-textarea"
+            id="dostInput"
+            placeholder="Ask Dost AI anything about writing, content, or strategy..."
+            rows="1"
+            onkeydown="dostKeydown(event)"
+            oninput="dostAutoResize(this)"
+          ></textarea>
+          <button class="dost-send" id="dostSendBtn" onclick="dostSend()">
+            <svg viewBox="0 0 16 16"><path d="M14 8L2 2l3 6-3 6 12-6z"/></svg>
+          </button>
+        </div>
+        <div class="dost-hint">Enter to send &nbsp;·&nbsp; Shift+Enter for new line</div>
+      </div>
+    </div>
+
+    <!-- SEO OPTIMIZER here -->
+    <div id="panel-seo" class="panel">
+      <div>
+        <div class="pg-eyebrow">SEO Optimizer</div>
+        <div class="pg-title">Rank higher,<br><em>write smarter</em></div>
+      </div>
+
+      <div class="card">
+        <div class="seo-tabs">
+          <button class="seo-tab on" onclick="seoTab('score',this)">SEO Score &amp; Feedback</button>
+          <button class="seo-tab"    onclick="seoTab('meta',this)">Meta Generator</button>
+          <button class="seo-tab"    onclick="seoTab('outline',this)">Article Outline</button>
+        </div>
+
+        <!-- SCOREpart -->
+        <div id="seo-score" class="seo-section on">
+          <div class="card-body">
+            <div class="field-row one" style="margin-bottom:12px;">
+              <div class="field">
+                <label class="flabel" id="target">Target Keyword *</label>
+                <input type="text" id="seo-keyword" placeholder="e.g. AI content marketing">
+              </div>
+            </div>
+            <div class="field-row one">
+              <div class="field">
+                <label class="flabel" id="content">Your Content *</label>
+                <textarea id="seo-content" rows="6" placeholder="Paste your content here to analyze..." oninput="countChars('seo-content','seoccount')"></textarea>
+              </div>
+            </div>
+            <div style="font-family:var(--f-mono);font-size:9.5px;color:var(--ink4);text-align:right;margin-top:4px;"><span id="seoccount">0</span> chars</div>
+          </div>
+          <div class="btn-block">
+            <button class="btn-secondary" id="seoscbtn" onclick="doSeoScore()">
+              <div class="spin dk" id="seoscspin"></div>
+              <span id="seosclbl">Analyze SEO</span>
+            </button>
+          </div>
+          <div class="errbox" id="seoscerr"></div>
+          <div id="seoscout" style="display:none;">
+            <div class="seo-score-wrap">
+              <div class="seo-ring-outer">
+                <svg viewBox="0 0 88 88">
+                  <circle class="seo-ring-bg"   cx="44" cy="44" r="36"/>
+                  <circle class="seo-ring-fill" id="seoRingFill" cx="44" cy="44" r="36"/>
+                </svg>
+                <div class="seo-ring-num" id="seoRingNum">0</div>
+              </div>
+              <div>
+                <div class="seo-score-label">Overall SEO Score</div>
+                <div class="seo-score-verdict" id="seoVerdict">—</div>
+                <div class="seo-score-hint"    id="seoHint">—</div>
+              </div>
+            </div>
+            <div class="seo-suggestions">
+              <div class="seo-suggestions-lbl">Actionable Suggestions</div>
+              <div id="seoItems"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- META GENERATOR  part-->
+        <div id="seo-meta" class="seo-section">
+          <div class="card-body">
+            <div class="field-row two" style="margin-bottom:12px;">
+              <div class="field">
+                <label class="flabel">Topic / Page Title *</label>
+                <input type="text" id="meta-topic" placeholder="e.g. Best AI Writing Tools 2025">
+              </div>
+              <div class="field">
+                <label class="flabel">Target Keyword</label>
+                <input type="text" id="meta-keyword" placeholder="e.g. AI writing tools">
+              </div>
+            </div>
+            <div class="field-row one">
+              <div class="field">
+                <label class="flabel">Brief Description (optional)</label>
+                <textarea id="meta-desc" rows="3" placeholder="What is this page about? Give context..."></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="btn-block">
+            <button class="btn-secondary" id="metabtn" onclick="doMetaGen()">
+              <div class="spin dk" id="metaspin"></div>
+              <span id="metalbl">Generate Meta Tags</span>
+            </button>
+          </div>
+          <div class="errbox" id="metaerr"></div>
+          <div id="metaout" style="display:none;">
+            <div class="seo-serp">
+              <div class="seo-serp-lbl">Google Search Preview</div>
+              <div class="seo-serp-url"   id="serpUrl">yourwebsite.com › page</div>
+              <div class="seo-serp-title" id="serpTitle">—</div>
+              <div class="seo-serp-desc"  id="serpDesc">—</div>
+            </div>
+            <div class="seo-meta-out">
+              <div class="seo-meta-field">
+                <div class="seo-meta-lbl">Meta Title <span id="metaTitleCount">0/60</span></div>
+                <div class="seo-meta-val title-val" id="metaTitleVal">—</div>
+                <button class="seo-meta-copy" id="metaTitleCp" onclick="seoMetaCopy('metaTitleVal','metaTitleCp')">Copy</button>
+              </div>
+              <div class="seo-meta-field">
+                <div class="seo-meta-lbl">Meta Description <span id="metaDescCount">0/160</span></div>
+                <div class="seo-meta-val" id="metaDescVal">—</div>
+                <button class="seo-meta-copy" id="metaDescCp" onclick="seoMetaCopy('metaDescVal','metaDescCp')">Copy</button>
+              </div>
+              <div class="seo-meta-field">
+                <div class="seo-meta-lbl">Focus Keyword Suggestions</div>
+                <div class="seo-meta-val" id="metaKwVal">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ARTICLE OUTLINE part -->
+        <div id="seo-outline" class="seo-section">
+          <div class="card-body">
+            <div class="field-row two" style="margin-bottom:12px;">
+              <div class="field">
+                <label class="flabel">Article Topic *</label>
+                <input type="text" id="outline-topic" placeholder="e.g. How to use AI for content marketing">
+              </div>
+              <div class="field">
+                <label class="flabel">Primary Keyword</label>
+                <input type="text" id="outline-keyword" placeholder="e.g. AI content marketing">
+              </div>
+            </div>
+            <div class="field-row two">
+              <div class="field">
+                <label class="flabel">Target Audience</label>
+                <input type="text" id="outline-audience" placeholder="e.g. Marketing managers">
+              </div>
+              <div class="field">
+                <label class="flabel">Article Type</label>
+                <select id="outline-type">
+                  <option value="how-to guide">How-To Guide</option>
+                  <option value="listicle">Listicle</option>
+                  <option value="in-depth review">In-Depth Review</option>
+                  <option value="comparison article">Comparison</option>
+                  <option value="thought leadership">Thought Leadership</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="btn-block">
+            <button class="btn-secondary" id="outlinebtn" onclick="doOutline()">
+              <div class="spin dk" id="outlinespin"></div>
+              <span id="outlinelbl">Generate Outline</span>
+            </button>
+          </div>
+          <div class="errbox" id="outlineerr"></div>
+          <div id="outlineout" style="display:none;">
+            <div class="seo-outline-out">
+              <div class="seo-suggestions-lbl" style="margin-bottom:14px;">SEO-Optimized Article Structure</div>
+              <div id="outlineItems"></div>
+            </div>
+            <div class="btn-block" style="display:flex;gap:8px;">
+              <button class="sm-btn" id="outlineCpBtn" onclick="copyOutline()">Copy Outline</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ASIDE part -->
+  <aside class="aside">
+    <div class="aside-stats">
+      <div class="astat">
+        <div class="astat-lbl">Generated</div>
+        <div class="astat-val" id="astatgen">0</div>
+        <div class="astat-sub">items</div>
+      </div>
+      <div class="astat">
+        <div class="astat-lbl">Avg. Words</div>
+        <div class="astat-val" id="astatavg">0</div>
+        <div class="astat-sub">per output</div>
+      </div>
+    </div>
+    <div class="aside-hist-hdr">
+      <span>Recent</span>
+      <button onclick="clearHistory()">Clear</button>
+    </div>
+    <div class="hist-list" id="hlist">
+      <div class="hist-empty">No generations yet.</div>
+    </div>
+  </aside>
+
+</div>
+
+<div class="toast-tray" id="toasttray"></div>
+
+<script>
+var API     = "http://127.0.0.1:8000";
+var selTpl  = "blog_intro";
+var selTone = "Professional";
+var selMode = "Simplify";
+var hist    = JSON.parse(localStorage.getItem("contentio_hist") || "[]");
+
+window.addEventListener('load', function(){ renderSidebar(); updateStats(); pingBackend(); });
+
+function pingBackend(){
+  var ctrl = new AbortController();
+  var tid  = setTimeout(function(){ ctrl.abort(); }, 4000);
+  fetch(API + "/", { signal: ctrl.signal })
+    .then(function(r){ clearTimeout(tid); setStatus(r.ok); })
+    .catch(function(){ setStatus(false); });
+}
+function setStatus(ok){
+  var c = ok ? 'ok' : 'err';
+  document.getElementById('spip').className = 'pip ' + c;
+  document.getElementById('slabel').textContent = ok ? 'API online' : 'API offline';
+}
+
+function gotoPanel(name, idx){
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('on'); });
+  document.getElementById('panel-' + name).classList.add('on');
+  document.querySelectorAll('.nav-tab').forEach(function(t,i){ t.classList.toggle('on', i===idx); });
+  document.querySelectorAll('.nbtn').forEach(function(b,i){ b.classList.toggle('on', i===idx); });
+  if(name === 'history') renderHistoryPage();
+}
+
+function pickTpl(el){
+  document.querySelectorAll('.tpl-cell').forEach(function(c){ c.classList.remove('on'); });
+  el.classList.add('on'); selTpl = el.getAttribute('data-v');
+}
+function pickTone(el){
+  document.querySelectorAll('#toneGrid .tone-chip').forEach(function(c){ c.classList.remove('on'); });
+  el.classList.add('on'); selTone = el.getAttribute('data-v');
+}
+function pickMode(el){
+  document.querySelectorAll('.mode-cell').forEach(function(c){ c.classList.remove('on'); });
+  el.classList.add('on'); selMode = el.getAttribute('data-v');
+}
+
+function countChars(inputId, cntId){
+  var v = document.getElementById(inputId).value;
+  document.getElementById(cntId).textContent = v.length;
+  if(inputId === 'pl-text')
+    document.getElementById('plwords').textContent = v.trim() ? v.trim().split(/\s+/).length : 0;
+}
+
+function setLoad(btnId, spinId, lblId, text, on){
+  document.getElementById(btnId).classList.toggle('busy', on);
+  document.getElementById(spinId).style.display = on ? 'block' : 'none';
+  document.getElementById(lblId).textContent = on ? 'Processing...' : text;
+}
+function showErr(id, msg){ var e=document.getElementById(id); e.textContent='Error — '+msg; e.classList.add('show'); }
+function hideErr(id){ document.getElementById(id).classList.remove('show'); }
+
+function typeText(el, text, cb){
+  el.textContent = '';
+  var cur = document.createElement('span'); cur.className = 'caret';
+  el.parentNode.appendChild(cur);
+  var i = 0;
+  function step(){
+    if(i < text.length){ el.textContent += text.slice(i, i+5); i += 5; setTimeout(step, 11); }
+    else { if(cur.parentNode) cur.parentNode.removeChild(cur); if(cb) cb(); }
+  }
+  step();
+}
+
+function doGenerate(){
+  var topic    = document.getElementById('g-topic').value.trim();
+  var audience = document.getElementById('g-audience').value.trim();
+  var length   = parseInt(document.getElementById('g-length').value, 10);
+  if(!topic){ toast('Please enter a topic.','err'); return; }
+  if(!length || length < 10){ toast('Enter a valid word count.','err'); return; }
+  hideErr('generr');
+  setLoad('genbtn','genspin','genlbl','Generate Content', true);
+  fetch(API + "/generate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ topic:topic, template:selTpl, tone:selTone, audience:audience, length:length })
+  })
+  .then(function(r){ if(!r.ok) return r.json().then(function(e){ throw new Error(JSON.stringify(e)); }); return r.json(); })
+  .then(function(data){
+    var c = data.generated_content || "(no content returned)";
+    document.getElementById('genout').classList.add('show');
+    typeText(document.getElementById('genbody'), c, function(){
+      document.getElementById('genwords').textContent = c.trim().split(/\s+/).length;
+      document.getElementById('genchars').textContent = c.length;
+    });
+    document.getElementById('genmeta').textContent = selTpl.replace(/_/g,' ') + ' · ' + selTone + ' · ' + length + 'w';
+    pushHist({ topic:topic, template:selTpl, tone:selTone, content:c });
+    toast('Content generated.', 'ok');
+  })
+  .catch(function(e){ showErr('generr', e.message); toast('Request failed.','err'); })
+  .finally(function(){ setLoad('genbtn','genspin','genlbl','Generate Content', false); });
+}
+
+function doRewrite(){
+  var text = document.getElementById('rw-text').value.trim();
+  if(!text){ toast('Paste some text first.','err'); return; }
+  hideErr('rwerr');
+  setLoad('rwbtn','rwspin','rwlbl','Rewrite Content', true);
+  fetch(API + "/rewrite", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text:text, mode:selMode })
+  })
+  .then(function(r){ if(!r.ok) return r.json().then(function(e){ throw new Error(JSON.stringify(e)); }); return r.json(); })
+  .then(function(data){
+    var c = data.rewritten_text || "(no content returned)";
+    document.getElementById('rwout').classList.add('show');
+    typeText(document.getElementById('rwbody'), c, function(){
+      document.getElementById('rwwords').textContent = c.trim().split(/\s+/).length;
+    });
+    document.getElementById('rwmeta').textContent = 'Mode: ' + selMode;
+    toast('Rewrite complete.', 'ok');
+  })
+  .catch(function(e){ showErr('rwerr', e.message); toast('Request failed.','err'); })
+  .finally(function(){ setLoad('rwbtn','rwspin','rwlbl','Rewrite Content', false); });
+}
+
+function doPlagiarism(){
+  var text = document.getElementById('pl-text').value.trim();
+  if(!text){ toast('Enter text to analyze.','err'); return; }
+  hideErr('plerr');
+  setLoad('plbtn','plspin','pllbl','Analyze Originality', true);
+  fetch(API + "/plagiarism", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text:text })
+  })
+  .then(function(r){ if(!r.ok) return r.json().then(function(e){ throw new Error(JSON.stringify(e)); }); return r.json(); })
+  .then(function(data){
+    var score = typeof data.similarity_score === 'number' ? data.similarity_score : 0;
+    document.getElementById('plout').classList.add('show');
+    document.getElementById('plmeta').textContent = text.trim().split(/\s+/).length + ' words analyzed';
+    var numEl = document.getElementById('plnum');
+    var cur=0, steps=40, inc=score/steps;
+    var t=setInterval(function(){ cur=Math.min(cur+inc,score); numEl.textContent=Math.round(cur)+'%'; if(cur>=score) clearInterval(t); },22);
+    setTimeout(function(){ document.getElementById('plbar').style.width=score+'%'; }, 80);
+    var fill=document.getElementById('plbar'), verd=document.getElementById('plverdict'), det=document.getElementById('pldetail');
+    if(score < 20){
+      numEl.style.color='var(--green)'; fill.style.background='var(--green)';
+      verd.style.cssText='background:var(--green-bg);color:var(--green);border-color:var(--green);';
+      verd.textContent='Original';
+      det.textContent='Minimal similarity detected. The content appears to be substantially original.';
+    } else if(score < 50){
+      numEl.style.color='var(--gold)'; fill.style.background='var(--gold)';
+      verd.style.cssText='background:var(--gold-bg);color:var(--gold);border-color:var(--gold);';
+      verd.textContent='Moderate';
+      det.textContent='Some similarity found. Consider paraphrasing certain sections for improved originality.';
+    } else {
+      numEl.style.color='var(--red)'; fill.style.background='var(--red)';
+      verd.style.cssText='background:var(--red-bg);color:var(--red);border-color:var(--red);';
+      verd.textContent='High Risk';
+      det.textContent='Significant similarity detected. Substantial rewriting is strongly recommended.';
+    }
+    toast('Analysis complete.', 'ok');
+  })
+  .catch(function(e){ showErr('plerr', e.message); toast('Request failed.','err'); })
+  .finally(function(){ setLoad('plbtn','plspin','pllbl','Analyze Originality', false); });
+}
+
+function copyOut(bodyId, btnId){
+  var text = document.getElementById(bodyId).textContent;
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){ flashCopy(btnId); }).catch(function(){ fbCopy(text,btnId); });
+  } else { fbCopy(text,btnId); }
+}
+function fbCopy(text, btnId){
+  var ta=document.createElement('textarea'); ta.value=text; ta.style.cssText='position:fixed;opacity:0;';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try{ document.execCommand('copy'); flashCopy(btnId); } catch(e){ toast('Copy failed.','err'); }
+  document.body.removeChild(ta);
+}
+function flashCopy(btnId){
+  var btn=document.getElementById(btnId); btn.classList.add('did'); btn.textContent='Copied';
+  setTimeout(function(){ btn.classList.remove('did'); btn.textContent='Copy'; }, 2000);
+  toast('Copied to clipboard.','ok');
+}
+
+function pushHist(item){
+  item.time = new Date().toISOString();
+  hist.unshift(item); if(hist.length>100) hist.pop();
+  localStorage.setItem("contentio_hist", JSON.stringify(hist));
+  renderSidebar(); updateStats();
+}
+function saveManual(){
+  var text = document.getElementById('genbody').textContent;
+  if(!text){ toast('Nothing to save.','err'); return; }
+  pushHist({ topic:document.getElementById('g-topic').value, template:selTpl, tone:selTone, content:text });
+  toast('Saved to history.','ok');
+}
+function clearHistory(){
+  hist=[]; localStorage.removeItem("contentio_hist");
+  renderSidebar(); renderHistoryPage(); updateStats(); toast('History cleared.','inf');
+}
+function loadFromBackend(){
+  fetch(API+"/history")
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      var items=data.history||[], added=0;
+      items.forEach(function(item){
+        if(!hist.find(function(h){ return h.topic===item.topic&&h.content===item.content; })){
+          hist.push({ topic:item.topic||'', template:item.template||'', tone:item.tone||'', content:item.content||'', time:item.time||new Date().toISOString() });
+          added++;
+        }
+      });
+      localStorage.setItem("contentio_hist",JSON.stringify(hist));
+      renderSidebar(); renderHistoryPage(); updateStats();
+      toast('Synced '+added+' items.','ok');
+    })
+    .catch(function(e){ toast('Sync failed: '+e.message,'err'); });
+}
+function loadHistItem(i){
+  var h=hist[i]; if(!h) return;
+  document.getElementById('g-topic').value=h.topic||'';
+  document.getElementById('genbody').textContent=h.content||'';
+  document.getElementById('genout').classList.add('show');
+  document.getElementById('genwords').textContent=(h.content||'').trim().split(/\s+/).length;
+  document.getElementById('genchars').textContent=(h.content||'').length;
+  document.getElementById('genmeta').textContent=(h.template||'').replace(/_/g,' ')+' · '+(h.tone||'');
+  gotoPanel('generate',0); toast('Loaded from history.','inf');
+}
+function renderSidebar(){
+  var list=document.getElementById('hlist');
+  document.getElementById('nbadge').textContent=hist.length;
+  if(!hist.length){ list.innerHTML='<div class="hist-empty">No generations yet.</div>'; return; }
+  var html='';
+  hist.slice(0,20).forEach(function(h,i){
+    var t=new Date(h.time), ts=isNaN(t)?'':t.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    var wc=h.content?h.content.trim().split(/\s+/).length:0;
+    html+='<div class="hist-item" onclick="loadHistItem('+i+')">'
+      +'<div class="hi-type">'+(h.template||'').replace(/_/g,' ')+'  ·  '+ts+'</div>'
+      +'<div class="hi-topic">'+(h.topic||'Untitled')+'</div>'
+      +'<div class="hi-prev">'+(h.content||'').slice(0,90)+'…</div>'
+      +'<div class="hi-chips"><span class="hi-chip">'+(h.tone||'—')+'</span><span class="hi-chip">'+wc+'w</span></div>'
+      +'</div>';
+  });
+  list.innerHTML=html;
+}
+function renderHistoryPage(){
+  var grid=document.getElementById('hfgrid');
+  document.getElementById('hfcount').textContent=hist.length+' items';
+  if(!hist.length){ grid.innerHTML='<div class="hgrid-empty">No history yet. Generate some content to get started.</div>'; return; }
+  var html='';
+  hist.forEach(function(h,i){
+    var t=new Date(h.time), ts=isNaN(t)?'':t.toLocaleDateString();
+    var wc=h.content?h.content.trim().split(/\s+/).length:0;
+    html+='<div class="hcard" onclick="loadHistItem('+i+');gotoPanel(\'generate\',0)">'
+      +'<div class="hc-type">'+(h.template||'').replace(/_/g,' ')+'</div>'
+      +'<div class="hc-topic">'+(h.topic||'Untitled')+'</div>'
+      +'<div class="hc-prev">'+(h.content||'').slice(0,180)+'…</div>'
+      +'<div class="hc-foot"><span class="hc-chip">'+(h.tone||'—')+'</span><span class="hc-chip">'+wc+'w</span><span class="hc-chip">'+ts+'</span></div>'
+      +'</div>';
+  });
+  grid.innerHTML=html;
+}
+function updateStats(){
+  document.getElementById('astatgen').textContent=hist.length;
+  var total=0; hist.forEach(function(h){ total+=h.content?h.content.trim().split(/\s+/).length:0; });
+  document.getElementById('astatavg').textContent=hist.length?Math.round(total/hist.length):0;
+}
+
+function toast(msg, type){
+  type=type||'ok';
+  var tray=document.getElementById('toasttray');
+  var el=document.createElement('div'); el.className='toast '+type;
+  var ico={ok:'&#10003;',err:'&#10007;',inf:'&#8594;'}[type]||'·';
+  el.innerHTML='<span class="t-ico">'+ico+'</span>'+msg;
+  tray.appendChild(el);
+  setTimeout(function(){ el.style.animation='tout .2s ease forwards'; setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); },200); },2800);
+}
+
+/* ── DOST AI ── */
+var dostHistory = [];
+var dostBusy    = false;
+
+function dostAutoResize(el){
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 130) + 'px';
+}
+function dostKeydown(e){
+  if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); dostSend(); }
+}
+function dostQuickSend(text){
+  document.getElementById('dostInput').value = text;
+  dostSend();
+}
+function dostClear(){
+  dostHistory = [];
+  var msgs = document.getElementById('dostMsgs');
+  msgs.innerHTML = '';
+  var tpl = document.getElementById('dostWelcomeTpl');
+  if(tpl){
+    var clone = tpl.cloneNode(true);
+    clone.id = 'dostWelcome';
+    clone.style.display = '';
+    msgs.appendChild(clone);
+  }
+}
+function dostHideWelcome(){
+  var w = document.getElementById('dostWelcome');
+  if(w && w.parentNode) w.parentNode.removeChild(w);
+}
+function dostAppendMsg(role, content){
+  dostHideWelcome();
+  var msgs = document.getElementById('dostMsgs');
+  var wrap = document.createElement('div'); wrap.className = 'msg ' + role;
+  var av   = document.createElement('div'); av.className = 'msg-avatar'; av.textContent = role === 'user' ? 'You' : 'AI';
+  var bub  = document.createElement('div'); bub.className = 'msg-bubble'; bub.textContent = content;
+  wrap.appendChild(av); wrap.appendChild(bub);
+  msgs.appendChild(wrap);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function dostShowTyping(){
+  dostHideWelcome();
+  var msgs = document.getElementById('dostMsgs');
+  var wrap = document.createElement('div'); wrap.className = 'msg assistant msg-typing'; wrap.id = 'dostTyping';
+  var av   = document.createElement('div'); av.className = 'msg-avatar'; av.textContent = 'AI';
+  var bub  = document.createElement('div'); bub.className = 'msg-bubble';
+  bub.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+  wrap.appendChild(av); wrap.appendChild(bub);
+  msgs.appendChild(wrap);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function dostHideTyping(){
+  var t = document.getElementById('dostTyping');
+  if(t && t.parentNode) t.parentNode.removeChild(t);
+}
+function dostSend(){
+  if(dostBusy) return;
+  var input = document.getElementById('dostInput');
+  var text  = input.value.trim();
+  if(!text) return;
+  input.value = ''; input.style.height = 'auto';
+  dostBusy = true;
+  document.getElementById('dostSendBtn').disabled = true;
+  dostAppendMsg('user', text);
+  dostShowTyping();
+  var snap = dostHistory.slice();
+  fetch(API + "/dost/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: text, history: snap })
+  })
+  .then(function(r){ if(!r.ok) return r.json().then(function(e){ throw new Error(JSON.stringify(e)); }); return r.json(); })
+  .then(function(data){
+    dostHideTyping();
+    var reply = data.reply || "(no response)";
+    dostAppendMsg('assistant', reply);
+    dostHistory.push({ role:'user', content:text });
+    dostHistory.push({ role:'assistant', content:reply });
+    if(dostHistory.length > 40) dostHistory = dostHistory.slice(-40);
+  })
+  .catch(function(e){
+    dostHideTyping();
+    dostAppendMsg('assistant', 'Sorry, something went wrong: ' + e.message);
+  })
+  .finally(function(){
+    dostBusy = false;
+    document.getElementById('dostSendBtn').disabled = false;
+    document.getElementById('dostInput').focus();
+  });
+}
+
+/* ── SEO OPTIMIZER ── */
+function seoTab(name, el){
+  document.querySelectorAll('.seo-tab').forEach(function(t){ t.classList.remove('on'); });
+  document.querySelectorAll('.seo-section').forEach(function(s){ s.classList.remove('on'); });
+  el.classList.add('on');
+  document.getElementById('seo-' + name).classList.add('on');
+}
+
+function escHtml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function doSeoScore(){
+  var keyword = document.getElementById('seo-keyword').value.trim();
+  var content = document.getElementById('seo-content').value.trim();
+  if(!keyword || !content){ toast('Enter a keyword and content.','err'); return; }
+  hideErr('seoscerr');
+  setLoad('seoscbtn','seoscspin','seosclbl','Analyze SEO', true);
+  fetch(API + "/seo/score", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ keyword:keyword, content:content })
+  })
+  .then(function(r){ if(!r.ok) return r.json().then(function(e){ throw new Error(JSON.stringify(e)); }); return r.json(); })
+  .then(function(data){
+    document.getElementById('seoscout').style.display = 'block';
+    animateSeoRing(data.score || 0);
+    document.getElementById('seoVerdict').textContent = data.verdict || '—';
+    document.getElementById('seoHint').textContent    = data.summary || '—';
+    var items = data.suggestions || [];
+    var html  = '';
+    items.forEach(function(s){
+      var cls = s.status === 'ok' ? 'ok' : s.status === 'warn' ? 'warn' : 'err';
+      var ico = s.status === 'ok' ? '✓'  : s.status === 'warn' ? '!'    : '✕';
+      html += '<div class="seo-item">'
+        + '<div class="seo-badge ' + cls + '">' + ico + '</div>'
+        + '<div class="seo-item-text"><b>' + escHtml(s.title) + '</b> — ' + escHtml(s.detail) + '</div>'
+        + '</div>';
+    });
+    document.getElementById('seoItems').innerHTML = html || '<div class="seo-item"><div class="seo-item-text">No suggestions returned.</div></div>';
+    toast('SEO analysis complete.', 'ok');
+  })
+  .catch(function(e){ showErr('seoscerr', e.message); toast('Request failed.','err'); })
+  .finally(function(){ setLoad('seoscbtn','seoscspin','seosclbl','Analyze SEO', false); });
+}
+
+function animateSeoRing(score){
+  var fill  = document.getElementById('seoRingFill');
+  var num   = document.getElementById('seoRingNum');
+  var circ  = 226;
+  var color = score >= 70 ? 'var(--green)' : score >= 40 ? 'var(--gold)' : 'var(--red)';
+  fill.style.stroke = color;
+  setTimeout(function(){ fill.style.strokeDashoffset = circ - (circ * score / 100); }, 60);
+  var cur = 0, step = score / 40;
+  var t = setInterval(function(){
+    cur = Math.min(cur + step, score);
+    num.textContent = Math.round(cur);
+    if(cur >= score) clearInterval(t);
+  }, 22);
+}
+
+function doMetaGen(){
+  var topic   = document.getElementById('meta-topic').value.trim();
+  var keyword = document.getElementById('meta-keyword').value.trim();
+  var desc    = document.getElementById('meta-desc').value.trim();
+  if(!topic){ toast('Enter a topic.','err'); return; }
+  hideErr('metaerr');
+  setLoad('metabtn','metaspin','metalbl','Generate Meta Tags', true);
+  fetch(API + "/seo/meta", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ topic:topic, keyword:keyword, description:desc })
+  })
+  .then(function(r){ if(!r.ok) return r.json().then(function(e){ throw new Error(JSON.stringify(e)); }); return r.json(); })
+  .then(function(data){
+    document.getElementById('metaout').style.display = 'block';
+    var title = data.meta_title || '—';
+    var descr = data.meta_description || '—';
+    var kws   = Array.isArray(data.keywords) ? data.keywords.join(', ') : (data.keywords || '—');
+    document.getElementById('metaTitleVal').textContent  = title;
+    document.getElementById('metaDescVal').textContent   = descr;
+    document.getElementById('metaKwVal').textContent     = kws;
+    document.getElementById('metaTitleCount').textContent = title.length + '/60';
+    document.getElementById('metaDescCount').textContent  = descr.length + '/160';
+    document.getElementById('serpTitle').textContent = title;
+    document.getElementById('serpDesc').textContent  = descr.length > 155 ? descr.slice(0,155) + '...' : descr;
+    document.getElementById('serpUrl').textContent   = 'yourwebsite.com › ' + topic.toLowerCase().replace(/\s+/g,'-').slice(0,30);
+    toast('Meta tags generated.', 'ok');
+  })
+  .catch(function(e){ showErr('metaerr', e.message); toast('Request failed.','err'); })
+  .finally(function(){ setLoad('metabtn','metaspin','metalbl','Generate Meta Tags', false); });
+}
+
+function doOutline(){
+  var topic    = document.getElementById('outline-topic').value.trim();
+  var keyword  = document.getElementById('outline-keyword').value.trim();
+  var audience = document.getElementById('outline-audience').value.trim();
+  var type     = document.getElementById('outline-type').value;
+  if(!topic){ toast('Enter an article topic.','err'); return; }
+  hideErr('outlineerr');
+  setLoad('outlinebtn','outlinespin','outlinelbl','Generate Outline', true);
+  fetch(API + "/seo/outline", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ topic:topic, keyword:keyword, audience:audience, article_type:type })
+  })
+  .then(function(r){ if(!r.ok) return r.json().then(function(e){ throw new Error(JSON.stringify(e)); }); return r.json(); })
+  .then(function(data){
+    document.getElementById('outlineout').style.display = 'block';
+    var sections = data.outline || [];
+    var html = '';
+    sections.forEach(function(s){
+      var tagCls = s.level === 'H1' ? 'h1' : s.level === 'H2' ? 'h2' : 'h3';
+      html += '<div class="seo-outline-item">'
+        + '<div class="seo-outline-tag ' + tagCls + '">' + escHtml(s.level) + '</div>'
+        + '<div class="seo-outline-text">' + escHtml(s.heading)
+        + (s.tip ? '<span class="seo-outline-kw">' + escHtml(s.tip) + '</span>' : '')
+        + '</div></div>';
+    });
+    document.getElementById('outlineItems').innerHTML = html || '<p style="color:var(--ink4);font-size:13px;font-weight:300;">No outline returned.</p>';
+    toast('Outline generated.', 'ok');
+  })
+  .catch(function(e){ showErr('outlineerr', e.message); toast('Request failed.','err'); })
+  .finally(function(){ setLoad('outlinebtn','outlinespin','outlinelbl','Generate Outline', false); });
+}
+
+function copyOutline(){
+  var items = document.querySelectorAll('.seo-outline-item');
+  var lines = [];
+  items.forEach(function(item){
+    var tag  = item.querySelector('.seo-outline-tag').textContent;
+    var text = item.querySelector('.seo-outline-text').childNodes[0].textContent;
+    lines.push(tag + '  ' + text);
+  });
+  var txt = lines.join('\n');
+  var btn = document.getElementById('outlineCpBtn');
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(function(){ btn.textContent='Copied'; setTimeout(function(){ btn.textContent='Copy Outline'; },2000); });
+  } else {
+    var ta=document.createElement('textarea'); ta.value=txt; ta.style.cssText='position:fixed;opacity:0;';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    btn.textContent='Copied'; setTimeout(function(){ btn.textContent='Copy Outline'; },2000);
+  }
+  toast('Outline copied.','ok');
+}
+
+function seoMetaCopy(valId, btnId){
+  var text = document.getElementById(valId).textContent;
+  var btn  = document.getElementById(btnId);
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){ btn.classList.add('did'); btn.textContent='Copied'; setTimeout(function(){ btn.classList.remove('did'); btn.textContent='Copy'; },2000); });
+  } else {
+    var ta=document.createElement('textarea'); ta.value=text; ta.style.cssText='position:fixed;opacity:0;';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    btn.classList.add('did'); btn.textContent='Copied'; setTimeout(function(){ btn.classList.remove('did'); btn.textContent='Copy'; },2000);
+  }
+  toast('Copied.','ok');
+}
+</script>
+
+<!-- Hidden welcome template for dostClear() reset -->
+<div id="dostWelcomeTpl" style="display:none;" class="dost-welcome">
+  <div class="dost-welcome-icon">
+    <svg viewBox="0 0 16 16"><circle cx="8" cy="6" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+  </div>
+  <h3>Hi, I&#39;m Dost AI</h3>
+  <p>Your writing companion. Ask me anything about content strategy, copywriting, or get feedback on your drafts.</p>
+  <div class="dost-prompts">
+    <button class="dost-prompt-btn" onclick="dostQuickSend('Help me write a compelling blog intro about AI in healthcare')">Blog intro ideas</button>
+    <button class="dost-prompt-btn" onclick="dostQuickSend('What makes a great LinkedIn post? Give me a framework')">LinkedIn tips</button>
+    <button class="dost-prompt-btn" onclick="dostQuickSend('How do I write a YouTube script that keeps viewers watching?')">YouTube scripts</button>
+    <button class="dost-prompt-btn" onclick="dostQuickSend('Give me 5 headline formulas that actually convert')">Headline formulas</button>
+    <button class="dost-prompt-btn" onclick="dostQuickSend('What is content.io and what can it do for me?')">About content.io</button>
+  </div>
+</div>
+
+</body>
+</html>
